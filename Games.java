@@ -1,6 +1,10 @@
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class Games {
@@ -15,14 +19,16 @@ public class Games {
             System.out.println("\t2. Snake and Ladder");
             System.out.println("\t3. Tic Tac Toe");
             System.out.println("\t4. Match Cards");
-            System.out.println("\t5. Quit");
+            System.out.println("\t5. View Leader Board");
+            System.out.println("\t6. Quit");
             System.out.print("Enter the game you want to play: "); 
             game = scanner.nextInt();
 
-            while (game < 1 || game > 5) {
+            while (game < 1 || game > 6) {
                 System.out.print("Enter the game you want to play: ");
                 game = scanner.nextInt();
             }
+            scanner.nextLine();
 
             System.out.println("\033[2J\033[1H");
 
@@ -48,13 +54,18 @@ public class Games {
                     break;
 
                 case 5:
+                    LeaderBoardManager lbm = new LeaderBoardManager();
+                    lbm.printLeaderBoard();
+                    break;
+
+                case 6:
                     scanner.close();
                     System.exit(0);
             }
 
             System.out.print("\nEnter any character to continue to the main menu: ");
             scanner.nextLine();
-        } while (game != 5);
+        } while (game != 6);
 
         scanner.close();
     }
@@ -80,7 +91,7 @@ class RockPaperScissor {
 
         switch (mode) {
             case 1 -> playerVsPlayer();
-            case 2 -> playerVscanneromputer();
+            case 2 -> playerVsComputer();
         }
 
         decideWinner();
@@ -103,18 +114,35 @@ class RockPaperScissor {
         return choice;
     }
 
+    /**
+     * makes sure that player's name has maximum length of 20
+     * @param playerName
+     * @result current name if not more than 20 letters, a new name otherwise
+     */
+    private String validPlayerName(String playerName) {
+        while (playerName.length() > 20) {
+            System.out.print("Enter name (maximum length = 20): ");
+            playerName = scanner.nextLine();
+        }
+
+        return playerName;
+    }
+
     /** 
      * Displays output based on the player 1 and player 2 choices
      */
     private void decideWinner() {
         System.out.print("\n");
+        LeaderBoardManager lbm = new LeaderBoardManager();
 
         if (player1Choice == player2Choice) {
             System.out.println("It's a Draw! Both players chose " + choices[player1Choice - 1] + ".");
         } else if ((player1Choice == player2Choice - 1) || (player2Choice == 3 && player1Choice == 1)) {
             System.out.println(player2Name + " Won! " + player1Name + " chose " + choices[player1Choice - 1] + " and " + player2Name + " chose " + choices[player2Choice - 1] + ".");
+            lbm.addEntryInLeaderBoard(player2Name, "Rock Paper Scissor");
         } else {
             System.out.println(player1Name + " Won! " + player1Name + " chose " + choices[player1Choice - 1] + " and " + player2Name + " chose " + choices[player2Choice - 1] + ".");
+            lbm.addEntryInLeaderBoard(player1Name, "Rock Paper Scissor");
         }
     }
 
@@ -141,8 +169,10 @@ class RockPaperScissor {
     private void playerVsPlayer() {
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         System.out.print("Enter name (Player 2): ");
         player2Name = scanner.nextLine();
+        player2Name = validPlayerName(player2Name);
 
         System.out.println("\n<------------------ " + player1Name + " ----------------->");
         player1Choice = takePlayerChoice();
@@ -150,9 +180,10 @@ class RockPaperScissor {
         player2Choice = takePlayerChoice();
     }
 
-    private void playerVscanneromputer() {
+    private void playerVsComputer() {
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         player2Name = "Computer";
         System.out.println("\n<------------------ " + player1Name + " ----------------->");
         player1Choice = takePlayerChoice();
@@ -207,12 +238,23 @@ class TicTacToe {
         return mode;
     }
 
+    private String validPlayerName(String playerName) {
+        while (playerName.length() > 20) {
+            System.out.print("Enter name (maximum length = 20): ");
+            playerName = scanner.nextLine();
+        }
+
+        return playerName;
+    }
+
     private void playerVsPlayer() {
         System.out.println("\033[2J\033[1H");
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         System.out.print("Enter name (Player 2): ");
         player2Name = scanner.nextLine();
+        player2Name = validPlayerName(player2Name);
 
         while ((!hasWinner()) && (!isDraw())) {
             System.out.println("\033[2J\033[1H");
@@ -245,6 +287,7 @@ class TicTacToe {
         System.out.println("\033[2J\033[1H");
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         player2Name = "Computer";
 
         while ((!hasWinner()) && (!isDraw())) {
@@ -389,12 +432,16 @@ class TicTacToe {
     }
 
     private void decideWinner(int winnerNumber) {
+        LeaderBoardManager lbm = new LeaderBoardManager();
+
         if (winnerNumber == 1) {
             System.out.println("\nCongratulations! " + player1Name + " has won.");
             System.out.println("Better Luck Next Time! " + player2Name + ".");
+            lbm.addEntryInLeaderBoard(player1Name, "Tic Tac Toe");
         } else {
             System.out.println("\nCongratulations! " + player2Name + " has won.");
             System.out.println("Better Luck Next Time! " + player1Name + ".");
+            lbm.addEntryInLeaderBoard(player2Name, "Tic Tac Toe");
         }
     }
 
@@ -485,21 +532,36 @@ class SnakeAndLadder {
     }
 
     private void decideWinner() {
+        LeaderBoardManager lbm = new LeaderBoardManager();
+
         System.out.println("\033[2J" + "\033[1H");
         if (player1Number == 100) {
             System.out.println("\nCongratulations! " + player1Name + " won the game.");
             System.out.println("Better Luck Next Time! " + player2Name + ".");
+            lbm.addEntryInLeaderBoard(player1Name, "Snake and Ladder");
         } else {
             System.out.println("Congratulations! " + player2Name + " won the game.");
             System.out.println("Better Luck Next Time! " + player1Name + ".");
+            lbm.addEntryInLeaderBoard(player2Name, "Snake and Ladder");
         }
+    }
+
+    private String validPlayerName(String playerName) {
+        while (playerName.length() > 20) {
+            System.out.print("Enter name (maximum length = 20): ");
+            playerName = scanner.nextLine();
+        }
+
+        return playerName;
     }
 
     private void playerVsPlayer() {
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         System.out.print("Enter name (Player 2): ");
         player2Name = scanner.nextLine();
+        player2Name = validPlayerName(player2Name);
 
         while (player1Number != 100 && player2Number != 100) {
             System.out.println("\n<--------------------- " + player1Name + " ----------------->");
@@ -547,6 +609,7 @@ class SnakeAndLadder {
     private void playerVsComputer() {
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         player2Name = "Computer";
 
         while (player1Number != 100 && player2Number != 100) {
@@ -808,6 +871,15 @@ class MatchCards {
         return mode;
     }
 
+    private String validPlayerName(String playerName) {
+        while (playerName.length() > 20) {
+            System.out.print("Enter name (maximum length = 20): ");
+            playerName = scanner.nextLine();
+        }
+
+        return playerName;
+    }
+
     /**
      * does all the necessary work required for each players turn
      * @param playerName
@@ -910,13 +982,17 @@ class MatchCards {
      * after the games ends, decide the winner based on the score of both players
      */
     private void decideWinner() {
+        LeaderBoardManager lbm = new LeaderBoardManager();
+
         System.out.println("\033[2J\033[1H");
         if (player1Score > player2Score) {
             System.out.println("Congratulations! " + player1Name + ".");
             System.out.println("Better Luck Next Time! " + player2Name + ".");
+            lbm.addEntryInLeaderBoard(player1Name, "Match Cards");
         } else if (player2Score > player1Score) {
             System.out.println("Congratulations! " + player2Name + ".");
             System.out.println("Better Luck Next Time! " + player1Name + ".");
+            lbm.addEntryInLeaderBoard(player2Name, "Match Cards");
         } else {
             System.out.println("It's a Draw!");
         }
@@ -929,8 +1005,10 @@ class MatchCards {
         System.out.println("\033[2J\033[1H");
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
         System.out.print("Enter name (Player 2): ");
         player2Name = scanner.nextLine();
+        player2Name = validPlayerName(player2Name);
 
         while (!allCardsFlipped()) {
             playersTurn(player1Name);
@@ -950,6 +1028,7 @@ class MatchCards {
         System.out.println("\033[2J\033[1H");
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
+        player1Name = validPlayerName(player1Name);
 
         while (!allCardsFlipped()) {
             playersTurn(player1Name);
@@ -1054,4 +1133,131 @@ class MatchCards {
             System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         }
     }
+}
+
+/**
+ * Manages the LeaderBoard
+ */
+class LeaderBoardManager {
+
+    /**
+     * creates a Leader Board file, if it does not exist
+     */
+    private void creatLeaderBoard() {
+        boolean newLeaderBoardCreated = false;
+        try {
+            File leaderBoardFile = new File("leader_board.txt");
+            newLeaderBoardCreated = leaderBoardFile.createNewFile();
+        } catch (IOException e) {
+            System.out.println("Error occured while creating file!");
+            e.printStackTrace();
+        }
+
+        if (newLeaderBoardCreated) {
+            try (FileWriter leaderBoardWriter = new FileWriter("leader_board.txt")) {
+                leaderBoardWriter.write("Name\t\t\t\t\t\tScore\t\tGame\n\n");
+            } catch (IOException e) {
+                System.out.println("Error while writing into the Leader Board file! from function: {createLeaderBoard}.");
+            }
+        }
+    }
+
+    /**
+     * update the score of the player if he already exists, otherwise add the player to leaderboard
+     * @param winnerName name of the winner
+     * @param gameName name of the game
+     */
+    void addEntryInLeaderBoard(String winnerName, String gameName) {
+        creatLeaderBoard();
+
+        boolean entryExists = false;
+        ArrayList<String> leaderBoardEntries = new ArrayList<String>();
+        ArrayList<Integer> leaderBoardEntriesScores = new ArrayList<Integer>();
+        File leaderBoard = new File("leader_board.txt");
+
+        try (Scanner leaderBoardReader = new Scanner(leaderBoard)) {
+
+            leaderBoardReader.nextLine(); // skip header
+
+            while (leaderBoardReader.hasNextLine()) {
+                String line = leaderBoardReader.nextLine().trim();
+
+                if (line.isEmpty())
+                    continue;
+
+                String name = line.substring(0, 48).trim();
+                int score = Integer.parseInt(line.substring(48, 63).trim());
+                String game = line.substring(63).trim();
+
+                if ((name.equals(winnerName)) && (game.equals(gameName))) {
+                    entryExists = true;
+                    score += 1;
+                }
+
+                leaderBoardEntries.add(String.format("%-47s %-15d %s%n", name, score, game));
+                leaderBoardEntriesScores.add(score);
+            }
+
+            // make a new entry for player, if player does not exist in leader board
+            if (!entryExists) {
+                leaderBoardEntries.add(String.format("%-47s %-15d %s%n", winnerName, 1, gameName));
+            }
+
+        } catch (IOException e) {
+
+            System.out.println("Error occured while writing to the Leader Board file! from function: { addEntryInLeaderBoard }.");
+            e.printStackTrace();
+
+        }
+
+        sortLeaderBoardEntries(leaderBoardEntriesScores, leaderBoardEntries);
+
+        try (FileWriter leaderBoardWriter = new FileWriter("leader_board.txt")) {
+
+            leaderBoardWriter.write(String.format("%-47s %-15s %s%n%n", "Name", "Score", "Game"));
+            for (String entry : leaderBoardEntries) {
+                leaderBoardWriter.write(entry);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error occured while writing to the Leader Board! from function: { addEntryInLeaderBoard }");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * sorts the entries in the leader board using the scores
+     */
+    private void sortLeaderBoardEntries(ArrayList<Integer> scores, ArrayList<String> entries) {
+		for (int i = 1; i < scores.size(); i++) {
+			for (int j = i; (j > 0) && (scores.get(j - 1) < scores.get(j)); j--) {
+                int scoreTemp = scores.get(j - 1);
+                String entryTemp = entries.get(j - 1);
+
+				scores.set(j - 1, scores.get(j));
+                entries.set(j - 1, entries.get(j));
+
+				scores.set(j, scoreTemp);
+                entries.set(j, entryTemp);
+			}
+		}
+    }
+
+    /**
+     * prints leader board
+     */
+    void printLeaderBoard() {
+        creatLeaderBoard();
+        File leaderBoard = new File("leader_board.txt");
+
+        try (Scanner leaderBoardReader = new Scanner(leaderBoard)) {
+            while (leaderBoardReader.hasNextLine()) {
+                System.out.println(leaderBoardReader.nextLine());
+            }
+        } catch (IOException e) {
+            System.out.println("Error occured while reading the leader board file! from function: { printLeaderBoard }.");
+            e.printStackTrace();
+        }
+    }
+
 }
