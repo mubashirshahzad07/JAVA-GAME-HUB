@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,7 @@ public class MatchCards {
     private int[] cards = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8};
     private int[] showCards = {-1, -1, -1 , -1, -1, -1, -1 , -1, -1, -1, -1 , -1, -1, -1, -1 , -1};
     private int previousCard = -1;
+    private HashMap<Integer, Integer> computerMemory = new HashMap<Integer, Integer>(); // HashMap<index of the card, value of the card>
 
     private final Random random = new Random();
     private final Scanner scanner;
@@ -91,7 +94,8 @@ public class MatchCards {
             System.out.print("Enter the card: ");
             int card = scanner.nextInt();
             card = correctCard(card, previousCard); // as previousCard = -1 (unset), no need to add 1 here
-
+            computerMemory.put(card, cards[card - 1]);
+            
             previousCard = card - 1;
             System.out.println("\033[2J\033[1H");
             printCards(-1);
@@ -99,10 +103,14 @@ public class MatchCards {
             System.out.print("Enter the card: ");
             card = scanner.nextInt();
             card = correctCard(card, previousCard + 1); // prevoiusCard = previouslyChosenCard - 1 => previousCard + 1 = previouslyChosenCard
+            computerMemory.put(card, cards[card - 1]);
 
             if (cards[card - 1] == cards[previousCard]) {
                 showCards[previousCard] = cards[previousCard];
                 showCards[card - 1] = cards[previousCard];
+                computerMemory.remove(card);
+                computerMemory.remove(previousCard + 1);
+
                 if (playerName.equals(player1Name)) {
                     player1Score++;
                 } else {
@@ -124,38 +132,69 @@ public class MatchCards {
     }
 
     /**
-     * does all the necessary work for computers turn
+     * does all the necessary work for computer's turn
      */
     private void computerTurn() {
         String playerName = "Computer";
         boolean cardsMatched = true;
+
         while ((cardsMatched) && (!allCardsFlipped())) {
             System.out.println("\033[2J\033[1H");
             printCards(-1);
+
             System.out.println("\n<------------------- " + playerName + " --------------------->");
-            int card = random.nextInt(1, 17);
-            card = correctCardComputer(card, previousCard);
-            System.out.println("Selected " + card + ".");
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
+
+            int card;
+            int cardPair = pairOfCardExists();
+
+            int[] pairofCards = new int[2];
+            if (cardPair != -1) {
+                pairofCards = pairOfCardsIndices(cardPair);
+                card = pairofCards[0];
+            } else {
+                card = random.nextInt(1, 17);
+                card = correctCardComputer(card, previousCard);
+                computerMemory.put(card, cards[card - 1]);
             }
+            
+            System.out.println("Selected " + card + ".");
+            logging();
+
+            scanner.next();
+            // try {
+            //     TimeUnit.SECONDS.sleep(2);
+            // } catch (InterruptedException e) {
+            //     Thread.currentThread().interrupt();
+            //     e.printStackTrace();
+            // }
 
             previousCard = card - 1;
             System.out.println("\033[2J\033[1H");
             printCards(-1);
             System.out.println("\n<------------------- " + playerName + " --------------------->");
-            card = random.nextInt(1, 16);
-            card = correctCardComputer(card, previousCard + 1);
-            System.out.println("Selected " + card + ".");
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
+
+            int previousCardPair = cardPair(card);
+            
+            if (cardPair != -1) {
+                card = pairofCards[1];
+            } else if (previousCardPair != -1) { // pair of the first card that is random exits return card else -1 
+                card = previousCardPair;
+            } else {
+                card = random.nextInt(1, 17);
+                card = correctCardComputer(card, previousCard + 1);
             }
+
+            System.out.println("Selected " + card + ".");
+            logging();
+
+            scanner.next();
+
+            // try {
+            //     TimeUnit.SECONDS.sleep(2);
+            // } catch (InterruptedException e) {
+            //     Thread.currentThread().interrupt();
+            //     e.printStackTrace();
+            // }
 
             if (cards[card - 1] == cards[previousCard]) {
                 showCards[previousCard] = cards[previousCard];
@@ -174,6 +213,55 @@ public class MatchCards {
                 previousCard = -1;
             }
         }
+    }
+
+    /**
+     * @return card if pair of cards exist in computer memory, -1 otherwise
+     */
+    private int pairOfCardExists() {
+        HashSet<Integer> cardsInMemory = new HashSet<Integer>();
+
+        for (int card : computerMemory.values()) {
+            if (cardsInMemory.contains(card)) {
+                return card;
+            }
+            cardsInMemory.add(card);
+        }
+
+        return -1;
+    }
+
+    /**
+     * @param cardPairFound card whose pair is previously found
+     * @return an array of size two, containing the indices of pair of cards
+     */
+    private int[] pairOfCardsIndices(int cardPairFound) {
+        int[] indices = new int[2];
+        int i = 0;
+
+        for (int index : computerMemory.keySet()) {
+            if (computerMemory.get(index) == cardPairFound) {
+                indices[i++] = index;
+            }
+        }
+
+        computerMemory.remove(indices[0]);
+        computerMemory.remove(indices[1]);
+
+        return indices;
+    }
+
+    /**
+     * @return index of the card if it matches the previous card, else -1
+     */
+    private int cardPair(int prevoiusComputerCard) {
+        for (int index : computerMemory.keySet()) {
+            if (computerMemory.get(index) == prevoiusComputerCard) {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     /**
@@ -329,6 +417,13 @@ public class MatchCards {
             }
 
             System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        }
+    }
+
+    // to be removed after debugging
+    private void logging() {
+        for (int index : computerMemory.keySet()) {
+            System.out.println(computerMemory.get(index) + " = " + index);
         }
     }
 }
