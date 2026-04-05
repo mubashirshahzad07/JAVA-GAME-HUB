@@ -1,6 +1,10 @@
 import java.util.Scanner;
 
 
+/**
+ * @author Mubashir Shahzad
+ * @LastModified 05 April 2026
+ */
 public class Games {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
