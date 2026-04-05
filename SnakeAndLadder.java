@@ -3,7 +3,10 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Snake and Ladder CLI Game
+ * It is CLI based Snake and Ladder Game. Provides user with two modes - (player vs player) and (player vs computer).
+ * 
+ * @author Mubashir Shahzad
+ * @since 05 April, 2026
  */
 public class SnakeAndLadder {
     // ANSI color codes

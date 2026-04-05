@@ -2,6 +2,12 @@ import java.util.Random;
 import java.util.Scanner;
 
 
+/**
+ * It is a simple Rock Paper Scissor game. Provides user with two modes - (player vs player) and (player vs computer).
+ * 
+ * @author Mubashir Shahzad
+ * @since 05 April, 2026
+ */
 public class RockPaperScissor {
     private int player1Choice;
     private int player2Choice;

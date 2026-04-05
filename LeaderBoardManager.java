@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Manages the LeaderBoard
+ * Manages the leader board tasks (creating, updating, sorting and printing).
+ *
+ * @author Mubashir Shahzad
+ * @since 04 April 2026
  */
 public class LeaderBoardManager {
     /**

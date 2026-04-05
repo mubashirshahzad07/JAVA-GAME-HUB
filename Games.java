@@ -1,9 +1,10 @@
 import java.util.Scanner;
 
-
 /**
+ * Primary class responsible for running Game Hub application.
+ *
  * @author Mubashir Shahzad
- * @LastModified 05 April 2026
+ * @since 05 April 2026
  */
 public class Games {
     public static void main(String[] args) {

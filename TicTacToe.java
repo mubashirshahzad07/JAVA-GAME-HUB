@@ -3,7 +3,10 @@ import java.util.Random;
 
 
 /**
- * Tic Tac Toe CLI Game
+ * It provides user with two modes - (player vs player) and (player vs computer)
+ * 
+ * @author Mubashir Shahzad
+ * @since 05 April, 2026
  */
 public class TicTacToe {
     // 0 for none, -1 for cross and 1 for tick

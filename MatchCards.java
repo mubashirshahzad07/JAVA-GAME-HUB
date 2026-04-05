@@ -4,7 +4,10 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Match Card Memory Game
+ * Provides user with two modes - (player vs player) and (player vs computer)
+ *
+ * @author Mubashir Shahzad
+ * @since 05 April, 2026
  */
 public class MatchCards {
     private String player1Name;
