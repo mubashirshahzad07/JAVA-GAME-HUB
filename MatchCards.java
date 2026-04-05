@@ -44,6 +44,7 @@ public class MatchCards {
             case 2 -> playerVsComputer();
         }
 
+        scanner.nextLine();
         decideWinner();
     }
 
@@ -158,43 +159,39 @@ public class MatchCards {
             }
             
             System.out.println("Selected " + card + ".");
-            logging();
 
-            scanner.next();
-            // try {
-            //     TimeUnit.SECONDS.sleep(2);
-            // } catch (InterruptedException e) {
-            //     Thread.currentThread().interrupt();
-            //     e.printStackTrace();
-            // }
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
 
             previousCard = card - 1;
             System.out.println("\033[2J\033[1H");
             printCards(-1);
             System.out.println("\n<------------------- " + playerName + " --------------------->");
 
-            int previousCardPair = cardPair(card);
+            int previousCardPair = pairOfCard(card, cards[card - 1]);
             
             if (cardPair != -1) {
                 card = pairofCards[1];
-            } else if (previousCardPair != -1) { // pair of the first card that is random exits return card else -1 
+            } else if (previousCardPair != -1) { // if pair of the first card that is random exists return card, else -1 
                 card = previousCardPair;
             } else {
                 card = random.nextInt(1, 17);
                 card = correctCardComputer(card, previousCard + 1);
+                computerMemory.put(card, cards[card - 1]);
             }
 
             System.out.println("Selected " + card + ".");
-            logging();
 
-            scanner.next();
-
-            // try {
-            //     TimeUnit.SECONDS.sleep(2);
-            // } catch (InterruptedException e) {
-            //     Thread.currentThread().interrupt();
-            //     e.printStackTrace();
-            // }
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
 
             if (cards[card - 1] == cards[previousCard]) {
                 showCards[previousCard] = cards[previousCard];
@@ -254,9 +251,9 @@ public class MatchCards {
     /**
      * @return index of the card if it matches the previous card, else -1
      */
-    private int cardPair(int prevoiusComputerCard) {
+    private int pairOfCard(int previousIndex, int prevoiusComputerCard) {
         for (int index : computerMemory.keySet()) {
-            if (computerMemory.get(index) == prevoiusComputerCard) {
+            if ((computerMemory.get(index) == prevoiusComputerCard) && (index != previousIndex)) {
                 return index;
             }
         }
@@ -269,8 +266,8 @@ public class MatchCards {
      */
     private void decideWinner() {
         LeaderBoardManager lbm = new LeaderBoardManager();
-
         System.out.println("\033[2J\033[1H");
+
         if (player1Score > player2Score) {
             System.out.println("Congratulations! " + player1Name + ".");
             System.out.println("Better Luck Next Time! " + player2Name + ".");
@@ -315,6 +312,7 @@ public class MatchCards {
         System.out.print("Enter name (Player 1): ");
         player1Name = scanner.nextLine();
         player1Name = validPlayerName(player1Name);
+        player2Name = "Computer";
 
         while (!allCardsFlipped()) {
             playersTurn(player1Name);
@@ -420,10 +418,4 @@ public class MatchCards {
         }
     }
 
-    // to be removed after debugging
-    private void logging() {
-        for (int index : computerMemory.keySet()) {
-            System.out.println(computerMemory.get(index) + " = " + index);
-        }
-    }
 }
