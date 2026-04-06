@@ -121,14 +121,16 @@ public class MatchCards {
                 cardsMatched = false;
                 System.out.println("\033[2J\033[1H");
                 printCards(card - 1);
+
                 try {
                     TimeUnit.SECONDS.sleep(2);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     e.printStackTrace();
                 }
-                previousCard = -1;
             }
+
+            previousCard = -1;
         }
     }
 
@@ -196,6 +198,10 @@ public class MatchCards {
             if (cards[card - 1] == cards[previousCard]) {
                 showCards[previousCard] = cards[previousCard];
                 showCards[card - 1] = cards[previousCard];
+
+                computerMemory.remove(card);
+                computerMemory.remove(previousCard + 1);
+
                 player2Score++;
             } else {
                 cardsMatched = false;
@@ -237,13 +243,13 @@ public class MatchCards {
         int i = 0;
 
         for (int index : computerMemory.keySet()) {
-            if (computerMemory.get(index) == cardPairFound) {
+            if (computerMemory.get(index).equals(cardPairFound)) {
                 indices[i++] = index;
             }
         }
 
-        computerMemory.remove(indices[0]);
-        computerMemory.remove(indices[1]);
+        // computerMemory.remove(indices[0]);
+        // computerMemory.remove(indices[1]);
 
         return indices;
     }
