@@ -1,3 +1,5 @@
+package game.hub;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

@@ -1,3 +1,5 @@
+package game.hub;
+
 import java.util.Scanner;
 import java.util.Random;
 

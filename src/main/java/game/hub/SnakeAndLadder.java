@@ -1,3 +1,5 @@
+package game.hub;
+
 import java.util.Scanner;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -302,11 +304,7 @@ public class SnakeAndLadder {
             for (int col = 0; col < 10; col++) {
                 int cell = grid[row][col];
                 String sym = getCellSymbol(cell);
-                if (sym == (GREEN + BOLD + " 🪜 " + RESET)) {
-                    System.out.print(sym + " ║");
-                } else {
-                    System.out.print(sym + "║");
-                }
+                System.out.print(sym + "║");
             }
             System.out.println();
 
